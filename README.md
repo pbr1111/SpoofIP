@@ -9,3 +9,4 @@ A diferencia de otras muchas herramientas, es capaz de generar correctamente el 
 ##Cosas a tener en cuenta
 - Los datos enviados están *hardcodeados* en la variable ```char *data```.
 - No se pueden crear segmentos TCP (To-Do).
+- Puedes cambiar el número de datagramas de usuario a enviar modificando la línea ```for (int count = 0; count < 1; count++)``` y cambiar el retraso entre cada datagrama de usuario modificando ```Sleep(2);``` (To-Do, #define o parámetro de consola).
