@@ -1,46 +1,50 @@
-// IP header's structure
-typedef struct ip_hdr
-{
-	unsigned char ip_header_len : 4; // 4-bit header length (in 32-bit words)
-	unsigned char ip_version : 4;   // 4-bit IPv4 version
-	unsigned char ip_tos;          // IP type of service
-	unsigned short ip_total_length; // Total length
-	unsigned short ip_id;          // Unique identifier
+#include <stdio.h>
+#include <stdint.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
 
-	unsigned char ip_frag_offset : 5; // Fragment offset field
+#define BUFFER_LENGTH 8192 // Buffer length
 
-	unsigned char ip_more_fragment : 1;
-	unsigned char ip_dont_fragment : 1;
-	unsigned char ip_reserved_zero : 1;
+#pragma comment(lib, "Ws2_32.lib")
 
-	unsigned char ip_frag_offset1; //fragment offset
+// IP header's structure (little endian)
+typedef struct ip_hdr {
+	uint8_t ip_header_len : 4;
+	uint8_t ip_version : 4;
+	uint8_t ip_tos;
+	uint16_t ip_total_length;
 
-	unsigned char ip_ttl;          // Time to live
-	unsigned char ip_protocol;     // Protocol(TCP,UDP etc)
-	unsigned short ip_checksum;    // IP checksum
-	unsigned int ip_srcaddr;       // Source address
-	unsigned int ip_destaddr;      // Source address
+	uint16_t ip_id;
+	uint16_t ip_frag_offset;
+#define	IP_DF 0x4000 // Don't fragment flag
+#define	IP_MF 0x2000 // More fragments flag
+
+	uint8_t ip_ttl;
+	uint8_t ip_protocol;
+	uint16_t ip_checksum;
+
+	uint32_t ip_srcaddr;
+	uint32_t ip_destaddr;
 } IPV4_HDR, *PIPV4_HDR, FAR * LPIPV4_HDR;
 
 // UDP header's structure
 typedef struct udp_hdr {
-	unsigned short int udph_srcport;
-	unsigned short int udph_destport;
-	unsigned short int udph_len;
-	unsigned short int udph_chksum;
+	uint16_t udph_srcport;
+	uint16_t udph_destport;
+	uint16_t udph_len;
+	uint16_t udph_chksum;
 } UDP_HDR;
 
 //Pseudo header UDP IPv4
-struct pseudo_header
-{
-	unsigned int source_address;
-	unsigned int dest_address;
-	unsigned char placeholder;
-	unsigned char protocol;
-	unsigned short int udp_length;
+struct pseudo_header {
+	uint32_t source_address;
+	uint32_t dest_address;
+	uint8_t placeholder;
+	uint8_t protocol;
+	uint16_t udp_length;
 };
 
-unsigned short csum(unsigned short *data, int len);
+uint16_t calculateIPChecksum(uint16_t *data, int len);
 IPV4_HDR* createHeaderIP(char* buffer, const char* src_addr, const char* dst_addr, const int data_len);
 UDP_HDR* createHeaderUDP(char* buffer, const char* srcport, const char* dstport, const int data_len);
-void calculateUDPChecksum(UDP_HDR *udp, IPV4_HDR *ip, unsigned char *data, const int data_len);
+void calculateUDPChecksum(UDP_HDR *udp, IPV4_HDR *ip, uint8_t *data, const int data_len);
